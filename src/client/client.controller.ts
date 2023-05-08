@@ -1,8 +1,10 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './create-client.dto';
+import { IsNumberString } from 'class-validator';
+import { ClientResponseDto } from './client-response.dto';
 
 @Controller('client')
 export class ClientController {
@@ -17,17 +19,17 @@ export class ClientController {
   constructor(private clientService: ClientService) { };
 
   @Get('/all')
-  getAllClients() {
+  async getAllClients(): Promise<ClientResponseDto[]> {
     return this.clientService.getAllClients();
   }
 
   @Get('/{clientId}')
-  getClientById(@Param() clientId: number) {
+  async getClientById(@Param('clientId', ParseIntPipe) clientId: number): Promise<ClientResponseDto> {
     return this.clientService.getClientById(clientId);
   }
 
   @Post()
-  createNewClient(@Body() createClientDto: CreateClientDto) {
+  async createNewClient(@Body() createClientDto: CreateClientDto): Promise<ClientResponseDto> {
     return this.clientService.createNewClient(createClientDto);
   }
 }
