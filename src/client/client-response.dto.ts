@@ -6,6 +6,6 @@ export class ClientResponseDto {
   name: string;
   email: string;
   phonenumber: string;
-  password: string;
+  // password: string;    // no password in response
   isActive: boolean;
 }

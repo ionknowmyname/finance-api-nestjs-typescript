@@ -12,3 +12,6 @@
 // migration branch uses type orm with migration
 
 // prisma branch would use prisma ORM
+
+
+// switched module in tsconfig from commonjs to nodenext so bcrypt works properly

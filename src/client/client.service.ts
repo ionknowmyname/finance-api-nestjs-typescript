@@ -6,7 +6,10 @@ import { Repository } from 'typeorm';
 import { Client } from './client.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClientResponseDto } from './client-response.dto';
-import { log } from 'console';
+// import { genSaltSync, hashSync, compareSync } from "bcrypt-ts";
+// import * as bcrypt from "bcrypt-ts";
+const bcrypt = import("bcrypt-ts");
+
 
 @Injectable()
 export class ClientService {
@@ -24,6 +27,10 @@ export class ClientService {
     if(foundClient) throw new Error(`Client with email ${createClientDto.email} already exists`);
 
     // hash password
+    const salt = (await bcrypt).genSaltSync(10);
+    const hashedPassword = (await bcrypt).hashSync(createClientDto.password, salt);
+    createClientDto.password = hashedPassword;
+
     const clientToSave = this.dtoToEntity(createClientDto);
 
     const savedClient = await this.clientRepository.save(clientToSave);
@@ -97,7 +104,7 @@ export class ClientService {
     dto.name = entity.name;
     dto.email = entity.email;
     dto.phonenumber = entity.phonenumber;
-    dto.password = entity.password;
+    // dto.password = entity.password;
     dto.isActive = entity.isActive;
 
     return dto;
