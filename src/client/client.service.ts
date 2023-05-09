@@ -16,6 +16,7 @@ export class ClientService {
     private clientRepository: Repository<Client>
   ) {}
 
+
   async createNewClient(createClientDto: CreateClientDto): Promise<ClientResponseDto> {
     
     const foundClient = await this.clientRepository.findOne({ where: { email: createClientDto.email } });
@@ -62,6 +63,32 @@ export class ClientService {
       return this.entityToDto(client) 
     });
   }
+
+  async activateClientById(clientId: number): Promise<ClientResponseDto | null> {
+    // return this.clientRepository.findOneBy({ id: clientId, });
+
+    const foundClient = await this.clientRepository.findOne({ where: { id: clientId } });
+
+    if(foundClient) {  
+
+      // update isActive to true
+
+      /* 
+        const ans = await this.clientRepository.update({ id: clientId }, { isActive: true });
+        console.log("ans --> ", ans);
+        console.log("ans.raw --> ", ans.raw); 
+      */
+
+      foundClient.isActive = true;
+      const updatedClient = await this.clientRepository.save(foundClient);
+      
+      const responseDto = this.entityToDto(updatedClient);
+
+      return responseDto;
+
+    } else throw new Error(`Client with id ${clientId} not found`);
+  }
+
 
   entityToDto(entity: Client): ClientResponseDto {
     const dto = new ClientResponseDto();

@@ -5,3 +5,10 @@
 // all transactions are between accounts on the system, no transfers out to external accounts
 
 // all apis are protected
+
+
+// master branch uses type orm with db sync; 
+
+// migration branch uses type orm with migration
+
+// prisma branch would use prisma ORM
