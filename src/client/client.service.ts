@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClientDto } from './create-client.dto';
 import { Repository } from 'typeorm';
 import { Client } from './client.entity';
@@ -24,7 +24,7 @@ export class ClientService {
     
     const foundClient = await this.clientRepository.findOne({ where: { email: createClientDto.email } });
     
-    if(foundClient) throw new Error(`Client with email ${createClientDto.email} already exists`);
+    if(foundClient) throw new ForbiddenException(`Client with email ${createClientDto.email} already exists`);
 
     // hash password
     const salt = (await bcrypt).genSaltSync(10);
@@ -50,7 +50,20 @@ export class ClientService {
 
       return responseDto;
 
-    } else throw new Error(`Client with id ${clientId} not found`);
+    } else throw new NotFoundException(`Client with id ${clientId} not found`);
+  }
+
+  async getClientByEmail(email: string): Promise<Client | null> {
+    // return this.clientRepository.findOneBy({ id: clientId, });
+
+    const foundClient = await this.clientRepository.findOne({ where: { email: email } });
+
+    if(foundClient) {  // don't convert to dto
+      // const responseDto = this.entityToDto(foundClient);
+
+      return foundClient;
+
+    } else throw new NotFoundException(`Client with email ${email} not found`);
   }
 
   async getAllClients(): Promise<ClientResponseDto[]> {
@@ -93,7 +106,7 @@ export class ClientService {
 
       return responseDto;
 
-    } else throw new Error(`Client with id ${clientId} not found`);
+    } else throw new NotFoundException(`Client with id ${clientId} not found`);
   }
 
 
