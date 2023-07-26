@@ -8,7 +8,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ClientResponseDto } from './client-response.dto';
 // import { genSaltSync, hashSync, compareSync } from "bcrypt-ts";
 // import * as bcrypt from "bcrypt-ts";
-const bcrypt = import("bcrypt-ts");
+// const bcrypt = import("bcrypt-ts");
+
+import * as argon2 from "argon2";
 
 
 @Injectable()
@@ -27,8 +29,11 @@ export class ClientService {
     if(foundClient) throw new ForbiddenException(`Client with email ${createClientDto.email} already exists`);
 
     // hash password
-    const salt = (await bcrypt).genSaltSync(10);
-    const hashedPassword = (await bcrypt).hashSync(createClientDto.password, salt);
+    
+    // const salt = (await bcrypt).genSaltSync(10);
+    // const hashedPassword = (await bcrypt).hashSync(createClientDto.password, salt);
+
+    const hashedPassword = await argon2.hash(createClientDto.password);
     createClientDto.password = hashedPassword;
 
     const clientToSave = this.dtoToEntity(createClientDto);

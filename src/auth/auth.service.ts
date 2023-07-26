@@ -7,7 +7,9 @@ import { ClientService } from '../client/client.service.js';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 // import { compareSync } from 'bcrypt-ts';
-const bcrypt = import("bcrypt-ts");
+// const bcrypt = import("bcrypt-ts");
+
+import * as argon2 from "argon2";
 
 
 @Injectable()
@@ -22,9 +24,10 @@ export class AuthService {
 
     if(foundClient) {
       // compare passwords
-      const isMatch = (await bcrypt).compareSync(loginDto.password, foundClient.password);
-
+      // const isMatch = (await bcrypt).compareSync(loginDto.password, foundClient.password);
       // const isMatch = compareSync(loginDto.password, foundClient.password);
+
+      const isMatch = await argon2.verify(foundClient.password, loginDto.password);
 
       if(isMatch) {
         // generate token 
