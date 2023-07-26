@@ -1,13 +1,14 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { LoginRequestDto } from './login-request.dto';
-import { LoginResponseDto } from './login-response.dto';
-import { ClientService } from 'src/client/client.service';
+import { LoginRequestDto } from './login-request.dto.js';
+import { LoginResponseDto } from './login-response.dto.js';
+import { ClientService } from '../client/client.service.js';
 import { JwtService } from '@nestjs/jwt';
-import { Client } from 'src/client/client.entity';
 import { ConfigService } from '@nestjs/config';
+// import { compareSync } from 'bcrypt-ts';
 const bcrypt = import("bcrypt-ts");
+
 
 @Injectable()
 export class AuthService {
@@ -23,11 +24,15 @@ export class AuthService {
       // compare passwords
       const isMatch = (await bcrypt).compareSync(loginDto.password, foundClient.password);
 
+      // const isMatch = compareSync(loginDto.password, foundClient.password);
+
       if(isMatch) {
         // generate token 
         const responseDto = new LoginResponseDto();
 
-        const token = await this.createJwtToken(foundClient);
+        const { password, ...clientWithoutPassword } = foundClient;
+
+        const token = await this.createJwtToken(clientWithoutPassword);
 
         responseDto.clientId = foundClient.id;
         responseDto.clientEmail = foundClient.email;
@@ -43,8 +48,13 @@ export class AuthService {
   }
 
 
-  // create jwt for the whole client
-  createJwtToken(client: Client): Promise<string> {
+  // // create jwt for the whole client
+  // createJwtToken(client: Client): Promise<string> {
+  //   return this.jwt.signAsync({ client }, { expiresIn: '30m', secret: this.config.get('JWT_SECRET')})
+  // }
+
+  // create jwt for the whole client minus password
+  createJwtToken(client: any): Promise<string> {
     return this.jwt.signAsync({ client }, { expiresIn: '30m', secret: this.config.get('JWT_SECRET')})
   }
 }

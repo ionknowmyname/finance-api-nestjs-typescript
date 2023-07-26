@@ -58,8 +58,12 @@ export class ClientService {
 
     const foundClient = await this.clientRepository.findOne({ where: { email: email } });
 
-    if(foundClient) {  // don't convert to dto
+    if(foundClient) {  // don't convert to dto, passwword is needed
       // const responseDto = this.entityToDto(foundClient);
+
+      // const { password, ...remainingData } = foundClient;
+
+      // return remainingData;
 
       return foundClient;
 
